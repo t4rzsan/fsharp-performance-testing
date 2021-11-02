@@ -22,7 +22,7 @@ let processResultC data = Ok { data with Property3 = DateTime.Now }
 let processResultD data = Ok { data with Property4 = 41.2 }
 let processResultE data = Ok { data with Property5 = 23m }
 
-let runWithPiping data =
+let withPiping data =
     data
     |> processA
     |> processB
@@ -30,7 +30,7 @@ let runWithPiping data =
     |> processD
     |> processE
 
-let runWithBinding data =
+let withBinding data =
     data
     |> processResultA
     |> Result.bind processResultB
@@ -41,7 +41,7 @@ let runWithBinding data =
 let (>>=) m f =
     Result.bind f m 
 
-let runWithOperatorWithoutInlining data =
+let withOperatorWithoutInlining data =
     data
     |> processResultA
     >>= processResultB
@@ -52,7 +52,7 @@ let runWithOperatorWithoutInlining data =
 let inline (>>==) m f =
     Result.bind f m 
 
-let runWithOperatorWithInlining data =
+let withOperatorWithInlining data =
     data
     |> processResultA
     >>== processResultB
@@ -65,7 +65,7 @@ let inline (>>===) m f =
     | Error e -> Error e
     | Ok x -> f x
 
-let runWithOperatorWithOwnImplementationAndInlining data =
+let withOperatorWithOwnImplementationAndInlining data =
     data
     |> processResultA
     >>=== processResultB
@@ -78,7 +78,7 @@ let inline (>=>) a b x =
     | Ok v -> b v
     | Error e -> Error e
 
-let runWithKleisli data =
+let withKleisli data =
     data
     |> (processResultA
     >=> processResultB
@@ -91,7 +91,7 @@ let timeFunction f data =
        
     sw.Start()
     
-    [0 .. 1_000_000]
+    [0 .. 10_000_000]
     |> List.iter (fun _ -> f data |> ignore)
     
     sw.Stop()
@@ -109,17 +109,17 @@ let run f fName =
           Property4 = 23.2
           Property5 = 23m }
 
-    [1 .. 10]
+    [1 .. 100]
     |> List.averageBy (fun i -> timeFunction f data)
     |> print fName
 
 [<EntryPoint>]
 let main argv =
-    run runWithPiping (nameof runWithPiping)
-    run runWithBinding (nameof runWithBinding)
-    run runWithOperatorWithInlining (nameof runWithOperatorWithInlining)
-    run runWithOperatorWithoutInlining (nameof runWithOperatorWithoutInlining)
-    run runWithOperatorWithOwnImplementationAndInlining (nameof runWithOperatorWithOwnImplementationAndInlining)
-    run runWithKleisli (nameof runWithKleisli)
+    run withPiping (nameof withPiping)
+    run withBinding (nameof withBinding)
+    run withOperatorWithInlining (nameof withOperatorWithInlining)
+    run withOperatorWithoutInlining (nameof withOperatorWithoutInlining)
+    run withOperatorWithOwnImplementationAndInlining (nameof withOperatorWithOwnImplementationAndInlining)
+    run withKleisli (nameof withKleisli)
 
     0  
