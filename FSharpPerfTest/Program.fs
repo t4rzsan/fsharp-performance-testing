@@ -10,47 +10,55 @@ type Data =
       Property4: float
       Property5: decimal }
 
-let processData data = { data with Property1 = "some new string" }
+let processA data = { data with Property1 = "blabla2" }
+let processB data = { data with Property2 = 100 }
+let processC data = { data with Property3 = DateTime.Now }
+let processD data = { data with Property4 = 41.2 }
+let processE data = { data with Property5 = 23m }
 
-let processDataResult data = Ok { data with Property1 = "some new string" }
+let processResultA data = Ok { data with Property1 = "blabla2" }
+let processResultB data = Ok { data with Property2 = 100 }
+let processResultC data = Ok { data with Property3 = DateTime.Now }
+let processResultD data = Ok { data with Property4 = 41.2 }
+let processResultE data = Ok { data with Property5 = 23m }
 
 let withPiping data =
     data
-    |> processData
-    |> processData
-    |> processData
-    |> processData
-    |> processData
+    |> processA
+    |> processB
+    |> processC
+    |> processD
+    |> processE
 
 let withBinding data =
     data
-    |> processDataResult
-    |> Result.bind processDataResult
-    |> Result.bind processDataResult
-    |> Result.bind processDataResult
-    |> Result.bind processDataResult
+    |> processResultA
+    |> Result.bind processResultB
+    |> Result.bind processResultC
+    |> Result.bind processResultD
+    |> Result.bind processResultE
 
 let (>>=) m f =
     Result.bind f m 
 
 let withOperatorWithoutInlining data =
     data
-    |> processDataResult
-    >>= processDataResult
-    >>= processDataResult
-    >>= processDataResult
-    >>= processDataResult
+    |> processResultA
+    >>= processResultB
+    >>= processResultC
+    >>= processResultD
+    >>= processResultE
 
 let inline (>>==) m f =
     Result.bind f m 
 
 let withOperatorWithInlining data =
     data
-    |> processDataResult
-    >>== processDataResult
-    >>== processDataResult
-    >>== processDataResult
-    >>== processDataResult
+    |> processResultA
+    >>== processResultB
+    >>== processResultC
+    >>== processResultD
+    >>== processResultE
 
 let inline (>>===) m f =
     match m with
@@ -59,11 +67,11 @@ let inline (>>===) m f =
 
 let withOperatorWithOwnImplementationAndInlining data =
     data
-    |> processDataResult
-    >>=== processDataResult
-    >>=== processDataResult
-    >>=== processDataResult
-    >>=== processDataResult
+    |> processResultA
+    >>=== processResultB
+    >>=== processResultC
+    >>=== processResultD
+    >>=== processResultE
 
 let inline (>=>) a b x =
     match a x with
@@ -72,18 +80,18 @@ let inline (>=>) a b x =
 
 let withKleisli data =
     data
-    |> (processDataResult
-    >=> processDataResult
-    >=> processDataResult
-    >=> processDataResult
-    >=> processDataResult)
+    |> (processResultA
+    >=> processResultB
+    >=> processResultC
+    >=> processResultD
+    >=> processResultE)
 
 let timeFunction f data =
     let sw = Stopwatch()
        
     sw.Start()
     
-    [1 .. 10_000_000]
+    [0 .. 10_000_000]
     |> List.iter (fun _ -> f data |> ignore)
     
     sw.Stop()
@@ -95,7 +103,7 @@ let print functionName elapsed =
     
 let run f fName =
     let data =
-        { Property1 = "some string"
+        { Property1 = "Blabla"
           Property2 = 42
           Property3 = DateTime.Today
           Property4 = 23.2
