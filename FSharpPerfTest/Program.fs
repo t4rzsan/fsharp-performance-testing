@@ -22,6 +22,9 @@ let processResultC data = Ok { data with Property3 = DateTime.Now }
 let processResultD data = Ok { data with Property4 = 41.2 }
 let processResultE data = Ok { data with Property5 = 23m }
 
+let withNesting data =
+    processE (processD (processC (processB (processA data))))
+
 let withPiping data =
     data
     |> processA
@@ -91,17 +94,16 @@ let timeFunction f data =
        
     sw.Start()
     
-    [0 .. 10_000_000]
+    [0 .. 10_000]
     |> List.iter (fun _ -> f data |> ignore)
     
     sw.Stop()
     sw.Elapsed.TotalMilliseconds
     
-let print functionName elapsed =
-    let timespan = TimeSpan.FromMilliseconds(elapsed)
-    printfn "Elapsed on average (%s): %A" functionName timespan
+let print functionName index elapsed =
+    printfn "%s score: %i" functionName ((int)(((elapsed/index)*100.0)))
     
-let run f fName =
+let run f =
     let data =
         { Property1 = "Blabla"
           Property2 = 42
@@ -110,16 +112,17 @@ let run f fName =
           Property5 = 23m }
 
     [1 .. 100]
-    |> List.averageBy (fun i -> timeFunction f data)
-    |> print fName
+    |> List.sumBy (fun i -> timeFunction f data)
 
-[<EntryPoint>]
-let main argv =
-    run withPiping (nameof withPiping)
-    run withBinding (nameof withBinding)
-    run withOperatorWithInlining (nameof withOperatorWithInlining)
-    run withOperatorWithoutInlining (nameof withOperatorWithoutInlining)
-    run withOperatorWithOwnImplementationAndInlining (nameof withOperatorWithOwnImplementationAndInlining)
-    run withKleisli (nameof withKleisli)
+let results = [
+    (nameof withNesting), run withNesting;
+    (nameof withPiping), run withPiping;
+    (nameof withBinding), run withBinding;
+    (nameof withKleisli), run withKleisli;
+    (nameof withOperatorWithInlining), run withOperatorWithInlining;
+    (nameof withOperatorWithoutInlining), run withOperatorWithoutInlining;
+    (nameof withOperatorWithOwnImplementationAndInlining), run withOperatorWithOwnImplementationAndInlining] |> List.sortBy snd
 
-    0  
+let index = List.head results |> snd
+
+results |> List.iter (fun (fName,elapsed) -> print fName index elapsed)
