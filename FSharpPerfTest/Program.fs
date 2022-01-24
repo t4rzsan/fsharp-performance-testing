@@ -125,4 +125,4 @@ let results = [
 
 let index = List.head results |> snd
 
-results |> List.iter (fun (fName,elapsed) -> print fName index elapsed)
+results |> List.iter (fun (fName, elapsed) -> print fName index elapsed)
